@@ -1,0 +1,74 @@
+// Ambulans Egitim Takip Sistemi - Veritabani Semasi
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+
+  assignments  Assignment[]
+  progress     Progress[]
+
+  @@map("users")
+}
+
+model Video {
+  id              String   @id @default(uuid())
+  title           String
+  youtubeVideoId  String   // Ornek: dQw4w9WgXcQ
+  description     String?
+  durationSeconds Int?     // Player'dan ilk yuklemede ogrenilip cache'lenir
+  createdAt       DateTime @default(now())
+
+  assignments     Assignment[]
+  progress        Progress[]
+
+  @@map("videos")
+}
+
+// Hangi video hangi kullaniciya atanmis
+model Assignment {
+  id        String   @id @default(uuid())
+  userId    String
+  videoId   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@map("assignments")
+}
+
+// Her kullanicinin her videodaki izleme durumu
+model Progress {
+  id                 String   @id @default(uuid())
+  userId             String
+  videoId            String
+  lastWatchedSecond  Float    @default(0)
+  watchedPercentage  Float    @default(0)
+  isCompleted        Boolean  @default(false)
+  updatedAt          DateTime @updatedAt
+
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video              Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@map("progress")
+}
