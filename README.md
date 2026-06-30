@@ -1,8 +1,3 @@
-# Ambulans Egitim Takip Sistemi (PWA)
-
-Acil durum personeli icin YouTube egitim videolarinin izlenme durumunu
-takip eden, %90 tamamlama esigiyle calisan ve PWA olarak telefona
-yuklenebilen egitim takip sistemi.
 
 ## Mimari
 
